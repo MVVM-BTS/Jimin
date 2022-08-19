@@ -13,6 +13,7 @@ class Service {
     
     var currentModel = Model(currentDateTime: Date())
     
+    //Entity -> Model
     func fetchNow(onCompleted: @escaping (Model) -> Void){
         //서비스에서는 모델을 전달, 레포지토리에서는 엔티티를 전달
         repository.fetchNow{[weak self] entity in
