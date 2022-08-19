@@ -84,14 +84,30 @@ extension ViewController {
     ///뷰 모델의 데이터를 뷰컨의 리스트 데이터와 연동
     fileprivate func setBindings(){
         print("ViewController - setBindings")
+        
+        //list에 대한 바인딩.
         self.viewModel.$tempArray.sink{ (updatedList : [String]) in
             //여기서 넘어오는 Publisher를 구독한다. 넘어오는 이벤트를 받는다.
             //Rx의 subscribe와 같은 뜻.
             print("ViewController - updatedList.count: \(updatedList.count)")
             self.tempArray = updatedList //변경된 데이터 받아오고
-            self.myTableView.reloadData() //변경된 데이터 적용.
+//            self.myTableView.reloadData() //변경된 데이터 적용.
         }.store(in: &disposableBag)
        // ~여기에 담아 줌.
+        
+        //action에 대한 바인딩.
+        self.viewModel.dataUpdatedAction.sink{ (addingType :
+            ViewModel.AddingType) in
+            print("ViewController - dataUpdatedAction: \(addingType)")
+            switch addingType {
+//            case .append, reset:
+//                self.myTableView.reloadData()
+            case .prepend:
+                self.myTableView.reloadDataAndKeepOffset()
+            default:
+                self.myTableView.reloadData()
+            }
+        }.store(in: &disposableBag)
     }
 }
 //MARK: - UITableViewDelegate 관련 메소드
