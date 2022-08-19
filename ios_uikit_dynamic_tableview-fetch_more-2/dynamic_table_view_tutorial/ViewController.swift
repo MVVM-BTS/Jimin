@@ -7,7 +7,9 @@
 //
 
 import UIKit
+import Combine
 
+//ViewController : MVVM의 View뷰. 렌더링
 class ViewController: UIViewController {
     
     //MARK: - Outlet
@@ -17,12 +19,15 @@ class ViewController: UIViewController {
     @IBOutlet var resetButton: UIBarButtonItem!
     @IBOutlet var appendButton: UIBarButtonItem!
     
-    var appendingCount: Int = 0
-    var prependingCount: Int = 0
-    var prependingArray = ["1 앞에 추가" , "2 앞에 추가", "3 앞에 추가", "4 앞에 추가", "5 앞에 추가", "6 앞에 추가", "7 앞에 추가", "8 앞에 추가"]
+    var viewModel: ViewModel = ViewModel() //ViewController가 생성이 될 때 viewModel도 같이 생성됨.
     
-    var addingArray = ["1 뒤에 추가" , "2 뒤에 추가", "3 뒤에 추가", "4 뒤에 추가", "5 뒤에 추가", "6 뒤에 추가", "7 뒤에 추가", "8 뒤에 추가"]
+    var disposableBag = Set<AnyCancellable>()
+    //Rx에서는 disposable Bag이라고 씀. 버리는 데이터를 메모리에서 날리는 역할.
+    //담아주고 구독해서 남은 애들을~
     
+    
+    //ViewController에 있던 데이터들은 지우고 ViewModel 파일로 이동.
+    //변경될 데이터만 남겨 둠. ViewModel에 있는 tempArray와 연동되게 사용될 것임.
     var tempArray : [String] = []
 //    var tempArray : [String] = [String]()
 
@@ -43,6 +48,8 @@ class ViewController: UIViewController {
         self.myTableView.delegate = self
         self.myTableView.dataSource = self
         
+        // 뷰모델의 데이터 상태 연동
+        self.setBindings()
     }
 
     
@@ -51,13 +58,15 @@ class ViewController: UIViewController {
         switch sender {
         case prependButton:
             print("앞에 추가 버튼 클릭!")
-            self.prependData()
+            self.viewModel.prependData()
+            // 값 바꾸는 부분은 뷰모델에서 하는 거니까 변경
+            
         case resetButton:
             print("데이터 리셋 버튼 클릭!")
-            self.resetData()
+            self.viewModel.resetData()
         case appendButton:
             print("뒤에 추가 버튼 클릭!")
-            self.appendData()
+            self.viewModel.appendData()
         default: break
         }
     }
@@ -66,39 +75,25 @@ class ViewController: UIViewController {
 
 //MARK: - 테이블뷰 관련 메소드
 extension ViewController {
-    
-    fileprivate func prependData(){
-        print(#fileID, #function, #line, "")
-        
-        prependingCount = prependingCount + 1
-        
-        let tempPrependingArray = prependingArray.map{ $0.appending(String(prependingCount)) }
-        
-        self.tempArray.insert(contentsOf: tempPrependingArray, at: 0)
-//        self.myTableView.reloadData()
-        self.myTableView.reloadDataAndKeepOffset()
-    }
-    
-    fileprivate func appendData(){
-        print(#fileID, #function, #line, "")
-        
-        appendingCount = appendingCount + 1
-        
-        let tempAddingArray = addingArray.map{ $0.appending(String(appendingCount)) }
-        
-        self.tempArray += tempAddingArray
-        self.myTableView.reloadData()
-    }
-    
-    fileprivate func resetData(){
-        print(#fileID, #function, #line, "")
-        appendingCount = 0
-        prependingCount = 0
-        tempArray = []
-        self.myTableView.reloadData()
-    }
+ //비즈니스 로직 코드들 삭제 후 뷰모델 파일로 이동
 }
 
+//MARK: - 뷰모델 관련
+extension ViewController {
+    
+    ///뷰 모델의 데이터를 뷰컨의 리스트 데이터와 연동
+    fileprivate func setBindings(){
+        print("ViewController - setBindings")
+        self.viewModel.$tempArray.sink{ (updatedList : [String]) in
+            //여기서 넘어오는 Publisher를 구독한다. 넘어오는 이벤트를 받는다.
+            //Rx의 subscribe와 같은 뜻.
+            print("ViewController - updatedList.count: \(updatedList.count)")
+            self.tempArray = updatedList //변경된 데이터 받아오고
+            self.myTableView.reloadData() //변경된 데이터 적용.
+        }.store(in: &disposableBag)
+       // ~여기에 담아 줌.
+    }
+}
 //MARK: - UITableViewDelegate 관련 메소드
 extension ViewController: UITableViewDelegate {
     
