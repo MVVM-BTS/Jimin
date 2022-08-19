@@ -8,5 +8,5 @@
 import Foundation
 
 struct Model {
-    let currentDateTime : Date
+    var currentDateTime : Date
 }
