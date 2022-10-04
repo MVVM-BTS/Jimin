@@ -61,7 +61,8 @@ final class MoviesSearchFlowCoordinator {
             let container = moviesListViewController.suggestionsListContainer else { return }
 
         let vc = dependencies.makeMoviesQueriesSuggestionsListViewController(didSelect: didSelect)
-
+        
+        //???: 컨테이너는 그냥 뷰인 것 같은데 어떻게,왜 뷰안에 뷰컨을 넣는 건지 이해를 못한 것 같아요
         moviesListViewController.add(child: vc, container: container)
         moviesQueriesSuggestionsVC = vc
         container.isHidden = false
