@@ -11,10 +11,13 @@ final class MoviesListViewController: UIViewController, StoryboardInstantiable, 
     
     @IBOutlet private var contentView: UIView!
     @IBOutlet private var moviesListContainer: UIView!
+    
+    //private(set) : 값을 세팅하는 것만 private, 값을 불러오는 것은 internal로 처리 가능.
     @IBOutlet private(set) var suggestionsListContainer: UIView!
     @IBOutlet private var searchBarContainer: UIView!
     @IBOutlet private var emptyDataLabel: UILabel!
     
+    // 바인딩을 위해
     private var viewModel: MoviesListViewModel!
     private var posterImagesRepository: PosterImagesRepository?
 
@@ -23,6 +26,7 @@ final class MoviesListViewController: UIViewController, StoryboardInstantiable, 
 
     // MARK: - Lifecycle
 
+    // MoviesSceneDIContainer에서 호출된다.
     static func create(with viewModel: MoviesListViewModel,
                        posterImagesRepository: PosterImagesRepository?) -> MoviesListViewController {
         let view = MoviesListViewController.instantiateViewController()
@@ -61,7 +65,7 @@ final class MoviesListViewController: UIViewController, StoryboardInstantiable, 
     }
 
     // MARK: - Private
-
+    // 정말 뷰 관련 작업들
     private func setupViews() {
         title = viewModel.screenTitle
         emptyDataLabel.text = viewModel.emptyDataTitle
@@ -100,6 +104,7 @@ final class MoviesListViewController: UIViewController, StoryboardInstantiable, 
             viewModel.closeQueriesSuggestions()
             return
         }
+        // 기능을 수행할 때는 ViewModel의 메서드 호출하여 수행.
         viewModel.showQueriesSuggestions()
     }
 
@@ -139,10 +144,14 @@ extension MoviesListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let searchText = searchBar.text, !searchText.isEmpty else { return }
         searchController.isActive = false
+        
+        // 기능을 수행할 때는 ViewModel의 메서드 호출하여 수행.
         viewModel.didSearch(query: searchText)
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        
+        // 기능을 수행할 때는 ViewModel의 메서드 호출하여 수행.
         viewModel.didCancelSearch()
     }
 }
