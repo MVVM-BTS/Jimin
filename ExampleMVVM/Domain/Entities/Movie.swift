@@ -7,6 +7,7 @@
 
 import Foundation
 
+// Entity는 비즈니스 모델을 담는다. 
 struct Movie: Equatable, Identifiable {
     typealias Identifier = String
     enum Genre {
