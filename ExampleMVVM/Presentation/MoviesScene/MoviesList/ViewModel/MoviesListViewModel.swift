@@ -20,6 +20,7 @@ enum MoviesListViewModelLoading {
     case nextPage
 }
 
+//???: 프로토콜을 함수들을 관리를 하는 데 쓴 것 같은데 이렇게 활용할 수 있구나라는 생각을 했다. 
 protocol MoviesListViewModelInput {
     func viewDidLoad()
     func didLoadNextPage()
@@ -44,8 +45,14 @@ protocol MoviesListViewModelOutput {
 
 protocol MoviesListViewModel: MoviesListViewModelInput, MoviesListViewModelOutput {}
 
+/*
+ ViewModel :
+ - Domain Layer(Entity, Use Cases, Repository Interfaces)에만 의존한다.
+ - UseCase 가져와서 UseCase 실행
+ */
 final class DefaultMoviesListViewModel: MoviesListViewModel {
 
+    // Domain Layer 의존
     private let searchMoviesUseCase: SearchMoviesUseCase
     private let actions: MoviesListViewModelActions?
 
@@ -101,6 +108,7 @@ final class DefaultMoviesListViewModel: MoviesListViewModel {
         self.loading.value = loading
         query.value = movieQuery.query
 
+        // UseCase 실행
         moviesLoadTask = searchMoviesUseCase.execute(
             requestValue: .init(query: movieQuery, page: nextPage),
             cached: appendPage,
@@ -133,6 +141,7 @@ extension DefaultMoviesListViewModel {
 
     func viewDidLoad() { }
 
+    // 구현은 private 함수에 해두고 호출하는 함수를 따로 만들어둔다.
     func didLoadNextPage() {
         guard hasMorePages, loading.value == .none else { return }
         load(movieQuery: .init(query: query.value),

@@ -21,6 +21,8 @@ extension MoviesListItemViewModel {
         self.title = movie.title ?? ""
         self.posterImagePath = movie.posterPath
         self.overview = movie.overview ?? ""
+        
+        // 뷰에 보여질 형태로 가공하는 비즈니스 로직.
         if let releaseDate = movie.releaseDate {
             self.releaseDate = "\(NSLocalizedString("Release Date", comment: "")): \(dateFormatter.string(from: releaseDate))"
         } else {
