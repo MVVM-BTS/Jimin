@@ -45,7 +45,7 @@ extension MoviesResponseDTO {
 }
 
 // MARK: - Mappings to Domain
-
+// Domain Layer에만 의존한다.
 extension MoviesResponseDTO {
     func toDomain() -> MoviesPage {
         return .init(page: page,
